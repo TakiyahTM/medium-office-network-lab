@@ -1,0 +1,349 @@
+SW-CORE-01
+
+Current configuration : 8465 bytes
+!
+version 12.2(37)SE1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname SW-CORE-01
+!
+!
+no profinet
+enable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+username netadmin secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip ssh authentication-retries 2
+ip ssh time-out 60
+ip domain-name office.test
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ switchport access vlan 70
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/2
+ switchport access vlan 70
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/3
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/4
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/5
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/6
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/7
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/8
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/9
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/10
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/11
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/12
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/13
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/14
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/15
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/16
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/17
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/18
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/19
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/20
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/21
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/22
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface FastEthernet0/23
+ description TO-SW-ACC-01
+ switchport trunk allowed vlan 10,20,40,99
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/24
+ description TO-SW-ACC-02
+ switchport trunk allowed vlan 30,40,60,99
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/1
+ description TO-RTR-EDGE-01
+ no switchport
+ ip address 10.10.254.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ switchport access vlan 999
+ switchport mode access
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan10
+ mac-address 00d0.5822.8101
+ ip address 10.10.10.1 255.255.255.0
+ ip helper-address 10.10.70.10
+ ip access-group STAFF-IN in
+!
+interface Vlan20
+ mac-address 00d0.5822.8102
+ ip address 10.10.20.1 255.255.255.0
+ ip helper-address 10.10.70.10
+ ip access-group FINANCE-IN in
+!
+interface Vlan30
+ mac-address 00d0.5822.8103
+ ip address 10.10.30.1 255.255.255.0
+ ip helper-address 10.10.70.10
+ ip access-group IT-IN in
+!
+interface Vlan40
+ mac-address 00d0.5822.8104
+ ip address 10.10.40.1 255.255.255.0
+ ip access-group PRINTERS-IN in
+!
+interface Vlan60
+ mac-address 00d0.5822.8105
+ ip address 10.10.60.1 255.255.255.0
+ ip helper-address 10.10.70.10
+ ip access-group GUEST-IN in
+!
+interface Vlan70
+ mac-address 00d0.5822.8106
+ ip address 10.10.70.1 255.255.255.0
+ ip access-group SERVERS-IN in
+!
+interface Vlan99
+ mac-address 00d0.5822.8107
+ ip address 10.10.99.1 255.255.255.0
+!
+router rip
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.10.254.1 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended STAFF-IN
+ remark DHCP requests
+ permit udp any eq bootpc any eq bootps
+ remark Local gateway and admin diagnostics
+ permit icmp 10.10.10.0 0.0.0.255 host 10.10.10.1 echo
+ permit icmp 10.10.10.0 0.0.0.255 host 10.10.30.10 echo-reply
+ remark Internal DNS
+ permit udp 10.10.10.0 0.0.0.255 host 10.10.70.10 eq domain
+ permit tcp 10.10.10.0 0.0.0.255 host 10.10.70.10 eq domain
+ remark Intranet and office printer
+ permit tcp 10.10.10.0 0.0.0.255 host 10.10.70.20 eq www
+ permit ip 10.10.10.0 0.0.0.255 host 10.10.40.10
+ remark Public website in DMZ
+ permit tcp 10.10.10.0 0.0.0.255 host 172.16.50.10 eq www
+ remark Block other private destinations
+ deny ip any 10.0.0.0 0.255.255.255
+ deny ip any 172.16.0.0 0.15.255.255
+ deny ip any 192.168.0.0 0.0.255.255
+ remark External web and ping
+ permit tcp 10.10.10.0 0.0.0.255 any eq www
+ permit tcp 10.10.10.0 0.0.0.255 any eq 443
+ permit icmp 10.10.10.0 0.0.0.255 any echo
+ deny ip any any
+ip access-list extended FINANCE-IN
+ permit udp any eq bootpc any eq bootps
+ permit icmp 10.10.20.0 0.0.0.255 host 10.10.20.1 echo
+ permit icmp 10.10.20.0 0.0.0.255 host 10.10.30.10 echo-reply
+ permit udp 10.10.20.0 0.0.0.255 host 10.10.70.10 eq domain
+ permit tcp 10.10.20.0 0.0.0.255 host 10.10.70.10 eq domain
+ permit tcp 10.10.20.0 0.0.0.255 host 10.10.70.20 eq www
+ permit ip 10.10.20.0 0.0.0.255 host 10.10.40.10
+ permit ip 10.10.20.0 0.0.0.255 host 10.10.40.11
+ permit tcp 10.10.20.0 0.0.0.255 host 172.16.50.10 eq www
+ deny ip any 10.0.0.0 0.255.255.255
+ deny ip any 172.16.0.0 0.15.255.255
+ deny ip any 192.168.0.0 0.0.255.255
+ permit tcp 10.10.20.0 0.0.0.255 any eq www
+ permit tcp 10.10.20.0 0.0.0.255 any eq 443
+ permit icmp 10.10.20.0 0.0.0.255 any echo
+ deny ip any any
+ip access-list extended IT-IN
+ permit ip host 10.10.30.10 any
+ permit udp any eq bootpc any eq bootps
+ permit icmp 10.10.30.0 0.0.0.255 host 10.10.30.1 echo
+ permit udp 10.10.30.0 0.0.0.255 host 10.10.70.10 eq domain
+ permit tcp 10.10.30.0 0.0.0.255 host 10.10.70.10 eq domain
+ permit tcp 10.10.30.0 0.0.0.255 host 10.10.70.20 eq www
+ permit ip 10.10.30.0 0.0.0.255 host 10.10.40.10
+ permit ip 10.10.30.0 0.0.0.255 host 10.10.40.11
+ permit tcp 10.10.30.0 0.0.0.255 host 172.16.50.10 eq www
+ deny ip any 10.0.0.0 0.255.255.255
+ deny ip any 172.16.0.0 0.15.255.255
+ deny ip any 192.168.0.0 0.0.255.255
+ permit tcp 10.10.30.0 0.0.0.255 any eq www
+ permit tcp 10.10.30.0 0.0.0.255 any eq 443
+ permit icmp 10.10.30.0 0.0.0.255 any echo
+ deny ip any any
+ip access-list extended GUEST-IN
+ permit udp any eq bootpc any eq bootps
+ permit icmp 10.10.60.0 0.0.0.255 host 10.10.60.1 echo
+ permit udp 10.10.60.0 0.0.0.255 host 198.51.100.10 eq domain
+ permit tcp 10.10.60.0 0.0.0.255 host 198.51.100.10 eq domain
+ deny ip any 10.0.0.0 0.255.255.255
+ deny ip any 172.16.0.0 0.15.255.255
+ deny ip any 192.168.0.0 0.0.255.255
+ permit tcp 10.10.60.0 0.0.0.255 any eq www
+ permit tcp 10.10.60.0 0.0.0.255 any eq 443
+ permit icmp 10.10.60.0 0.0.0.255 any echo
+ deny ip any any
+ip access-list standard ADMIN-SSH
+ permit host 10.10.30.10
+ deny any
+ip access-list extended SERVERS-IN
+ remark DHCP replies to relay interfaces
+ permit udp host 10.10.70.10 eq bootps 10.10.0.0 0.0.255.255 eq bootps
+ remark DHCP replies directly to clients
+ permit udp host 10.10.70.10 eq bootps any eq bootpc
+ remark DNS replies to internal clients
+ permit udp host 10.10.70.10 eq domain 10.10.0.0 0.0.255.255
+ permit tcp host 10.10.70.10 eq domain 10.10.0.0 0.0.255.255 established
+ remark Intranet HTTP replies
+ permit tcp host 10.10.70.20 eq www 10.10.0.0 0.0.255.255 established
+ remark Replies to admin diagnostic pings
+ permit icmp host 10.10.70.10 host 10.10.30.10 echo-reply
+ permit icmp host 10.10.70.20 host 10.10.30.10 echo-reply
+ remark Block other routed traffic from servers
+ deny ip any any
+ip access-list extended PRINTERS-IN
+ remark TCP replies from printers to internal clients
+ permit tcp host 10.10.40.10 10.10.0.0 0.0.255.255 established
+ permit tcp host 10.10.40.11 10.10.0.0 0.0.255.255 established
+ remark Ping replies from printers
+ permit icmp host 10.10.40.10 10.10.0.0 0.0.255.255 echo-reply
+ permit icmp host 10.10.40.11 10.10.0.0 0.0.255.255 echo-reply
+ remark Block other routed traffic from printers
+ deny ip any any
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+ login local
+!
+line aux 0
+!
+line vty 0 4
+ access-class ADMIN-SSH in
+ login local
+ transport input ssh
+!
+!
+!
+!
+end
